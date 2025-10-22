@@ -1,19 +1,28 @@
-public class ConfigurationManager {
-    // Private static instance variable
-    private static ConfigurationManager instance;
+class DatabaseConnection {
+    private String connectionString;
 
-    // Private constructor to prevent instantiation
-    private ConfigurationManager() {}
-
-    // Public static method to provide a single access point
-    public static ConfigurationManager getInstance() {
-        if (instance == null) {
-            instance = new ConfigurationManager();
-        }
-        return instance;
+    private DatabaseConnection() {
+        connectionString = "jdbc:mysql://localhost:3306/mydb";
+        System.out.println("Database connection established");
     }
+    
+    private static final DatabaseConnection INSTANCE = new DatabaseConnection();
+    
+    public static DatabaseConnection getInstance() {
+        return INSTANCE;
+    }
+    
+    public String getConnection() {
+        return connectionString;
+    }
+}
 
-    public void loadConfiguration() {
-        System.out.println("Configuration loaded");
+public class Main {
+    public static void main(String[] args) {
+        DatabaseConnection db1 = DatabaseConnection.getInstance();
+        DatabaseConnection db2 = DatabaseConnection.getInstance();
+
+        System.out.println("Same instance? " + (db1 == db2));
+        System.out.println("Connection: " + db1.getConnection());
     }
 }
