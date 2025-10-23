@@ -1,28 +1,77 @@
-class DatabaseConnection {
-    private String connectionString;
+import java.util.List;
+import java.util.ArrayList;
 
-    private DatabaseConnection() {
-        connectionString = "jdbc:mysql://localhost:3306/mydb";
-        System.out.println("Database connection established");
+public class DataPipeline {
+    private List<String> processingSteps;
+    private String outputFormat;
+
+    // Private constructor to enforce builder usage
+    private DataPipeline() {
+        this.processingSteps = new ArrayList<>();
     }
-    
-    private static final DatabaseConnection INSTANCE = new DatabaseConnection();
-    
-    public static DatabaseConnection getInstance() {
-        return INSTANCE;
+
+    public void addStep(String step) {
+        if (step == null || step.trim().isEmpty()) {
+            throw new IllegalArgumentException("Processing step cannot be null or empty");
+        }
+        this.processingSteps.add(step);
     }
-    
-    public String getConnection() {
-        return connectionString;
+
+    public void setOutputFormat(String format) {
+        if (format == null || format.trim().isEmpty()) {
+            throw new IllegalArgumentException("Output format cannot be null or empty");
+        }
+        this.outputFormat = format;
+    }
+
+    public List<String> getProcessingSteps() {
+        return new ArrayList<>(processingSteps);
+    }
+
+    public String getOutputFormat() {
+        return outputFormat;
+    }
+
+    public void execute() {
+        System.out.println("Executing pipeline with " + processingSteps.size() + " steps");
+        for (int i = 0; i < processingSteps.size(); i++) {
+            System.out.println("Step " + (i + 1) + ": " + processingSteps.get(i));
+        }
+        System.out.println("Output format: " + outputFormat);
+    }
+
+    static DataPipeline createInstance() {
+        return new DataPipeline();
     }
 }
 
-public class Main {
-    public static void main(String[] args) {
-        DatabaseConnection db1 = DatabaseConnection.getInstance();
-        DatabaseConnection db2 = DatabaseConnection.getInstance();
+// Guides the construction of a DataPipeline object
+public class PipelineBuilder {
+    private DataPipeline pipeline;
 
-        System.out.println("Same instance? " + (db1 == db2));
-        System.out.println("Connection: " + db1.getConnection());
+    public PipelineBuilder() {
+        this.pipeline = DataPipeline.createInstance();
+    }
+
+    public PipelineBuilder addStep(String step) {
+        pipeline.addStep(step);
+        return this;
+    }
+
+    public PipelineBuilder setOutputFormat(String format) {
+        pipeline.setOutputFormat(format);
+        return this;
+    }
+
+    public DataPipeline build() {
+        if (pipeline.getProcessingSteps().isEmpty()) {
+            throw new IllegalStateException("Pipeline must have at least one processing step");
+        }
+
+        if (pipeline.getOutputFormat() == null) {
+            throw new IllegalStateException("Pipeline must have an output format defined");
+        }
+        
+        return pipeline;
     }
 }
